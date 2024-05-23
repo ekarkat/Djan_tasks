@@ -28,6 +28,7 @@ def user_login(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
+                print(user.username)
                 login(request, user)
                 return redirect('core:home')  # Redirect to a success page.
             else:

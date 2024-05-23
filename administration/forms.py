@@ -34,7 +34,7 @@ class UserProfileForm(forms.ModelForm):
         username = self.cleaned_data.get('username')
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
-        user = User.objects.create(
+        user = User.objects.create_user(
             username=username,
             email=email,
             password=password,
