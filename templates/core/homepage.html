@@ -1,13 +1,43 @@
-<!-- core/templates/core/homepage.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Task Manager Home</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Welcome to the TasakManager Application!</h1>
-    <p>This is a simple homepage rendered by Django.</p>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Task Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                <form action="{% url 'administration:logout' %}" method="post">
+                    {% csrf_token %}
+                    <a href="{% url 'administration:logout' %}" class="nav-link">Logout</a>
+                </form>
+                
+                {% else %}
+                    <a class="nav-link" href="{% url 'administration:login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'administration:register' %}">Register</a>
+
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>Welcome to Task Manager</h1>
+        <p>This is your go-to app for managing tasks efficiently and effectively. Organize your tasks and get more done!</p>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

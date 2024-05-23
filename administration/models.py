@@ -6,8 +6,8 @@ from core.models import BaseModel
 # Create your models here.
 
 class UserProfile(BaseModel):
-	# user profile class with user, email, first_name, last_name, phone, image fields
-	# user profile is connected to user model with one to one relationship
+    # user profile class with user, email, first_name, last_name, phone, image fields
+    # user profile is connected to user model with one to one relationship
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(unique=True)
@@ -18,4 +18,3 @@ class UserProfile(BaseModel):
 
     def __str__(self):
         return self.user.username
-    

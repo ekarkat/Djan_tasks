@@ -6,6 +6,7 @@ from .models import WorkSpace
 
 
 # Create your views here.
+@login_required
 def create_workspace(request):
     if request.method == 'POST':
         form = WorkSpaceForm(request.POST, user=request.user)
@@ -17,5 +18,6 @@ def create_workspace(request):
             return redirect('admin')  # Redirect to a new URL
     else:
         form = WorkSpaceForm(user=request.user)
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    print(request.user)
     return render(request, 'taskmanager/create_workspace.html', context={'form': form})
-

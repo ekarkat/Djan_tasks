@@ -1,0 +1,15 @@
+{% extends 'core/base.htm' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="form-register">
+
+    <h2>Login</h2>
+    <form method="post" action="{% url 'administration:login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+{% endblock %}
