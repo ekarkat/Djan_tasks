@@ -22,14 +22,13 @@ class UserProfileForm(forms.ModelForm):
             raise forms.ValidationError('Username already exists')
         return username
 
-
     def clean_confirm_password(self):
         password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
         if password != confirm_password:
             raise forms.ValidationError('Passwords do not match')
         return confirm_password
-    
+
     def save(self):
         username = self.cleaned_data.get('username')
         email = self.cleaned_data.get('email')
