@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from .forms import WorkSpaceForm
-from .models import WorkSpace
+from .models import Workspace
 
 
 # Create your views here.

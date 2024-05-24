@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 from core.models import BaseModel
 
 # Create your models here.
-
-class WorkSpace(BaseModel):
+# user.workspace = workspace.object.filter(owner = user).all()
+# 
+class Workspace(BaseModel):
     # workspace class with title, description, owner, members fields
     # each workspace has a title, description, owner, members
     # each workspace has tasks that can be accessed by workspace.task_set.all()
@@ -13,7 +14,7 @@ class WorkSpace(BaseModel):
     # A user can access the workspaces they are members of by user.shared_workspaces.all()
 
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workspaces')
     members = models.ManyToManyField(User, related_name='shared_workspaces', blank=True)
     status = models.FloatField(blank=True, null=True)
@@ -23,10 +24,10 @@ class WorkSpace(BaseModel):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            instance = super(WorkSpace, self).save()
+            instance = super(Workspace, self).save()
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
         else:
-            instance = super(WorkSpace, self).save()
+            instance = super(Workspace, self).save()
             text = f"Updated by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         WorkSpaceComment.objects.create(workspace=self, user=self.owner, text=text)
@@ -48,11 +49,11 @@ class Unit(BaseModel):
     # A user can access the units shared with them by user.shared_units.all()
 
     title = models.CharField(max_length=100, verbose_name='Title')
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='units')
     members = models.ManyToManyField(User, related_name='shared_units', blank=True)
     status = models.FloatField(blank=True, null=True)
-    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE, related_name='units')
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='units')
 
     class Meta:
         verbose_name = 'Unit'
@@ -101,7 +102,7 @@ class Task(BaseModel):
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.OPEN)
     priority = models.CharField(max_length=10, choices=PriorityChoices.choices, blank=True, null=True)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='tasks')
-    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE, related_name='tasks')
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='tasks')
 
     def __str__(self):
         out = self.title + ' - ' + self.unit.title
@@ -126,7 +127,7 @@ class WorkSpaceComment(BaseModel):
     # each comment is connected to a workspace and user
     # each comment has a text field for the comment content
 
-    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE, related_name='comments')
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
 

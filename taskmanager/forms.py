@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import WorkSpace, Unit, Task
+from .models import Workspace, Unit, Task
 
 
 # forms for the models in the taskmanager app
@@ -12,7 +12,7 @@ class WorkSpaceForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super(WorkSpaceForm, self).__init__(*args, **kwargs)
     class Meta:
-        model = WorkSpace
+        model = Workspace
         fields = ['title', 'description']
 
 class UnitForm(forms.ModelForm):

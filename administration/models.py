@@ -17,4 +17,5 @@ class UserProfile(BaseModel):
     image = models.ImageField(upload_to='profile_pics', blank=True)
 
     def __str__(self):
-        return self.user.username
+        out = f"id :{self.id} - {self.user.username}"
+        return out
