@@ -22,6 +22,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserProfileCreateSerializer(serializers.Serializer):
+    # user profile create serializer with
     username = serializers.CharField()
     password = serializers.CharField()
     confirm_password = serializers.CharField()
@@ -42,20 +43,19 @@ class UserProfileCreateSerializer(serializers.Serializer):
             'phone',
         )
 
-    def validate(self, attrs):
-        if User.objects.filter(username=attrs.get('username')).exists():
+    def validate(self, data):
+        if User.objects.filter(username=data.get('username')).exists():
             raise ValidationError('username already exist')
 
-        if UserProfile.objects.filter(email=attrs.get('email')).exists():
+        if UserProfile.objects.filter(email=data.get('email')).exists():
             raise ValidationError('email already exist')
 
-        if attrs.get('password') != attrs.get('confirm_password'):
+        if data.get('password') != data.get('confirm_password'):
             raise ValidationError("passwords don't match")
 
-        return attrs
+        return data
 
     def create(self, validated_data):
-        #  do it yourself!!!!
         password = validated_data.pop('password')
         username = validated_data.pop('username')
         _ = validated_data.pop('confirm_password')
@@ -66,3 +66,36 @@ class UserProfileCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return UserProfileSerializer(instance).data
+
+
+class UserProfileUpdateSerializer(serializers.Serializer):
+    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    phone = serializers.CharField()
+
+    class Meta:
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone']
+
+    def validate(self, data):
+        # Ensure the new email, username is not already in use by another user
+        print(self.instance)
+        if User.objects.filter(username=data.get('user').get('username')).exists() and data.get('user').get('username') != self.instance.user.username:
+            raise ValidationError('username already exist')
+
+        if UserProfile.objects.filter(email=data.get('email')).exclude(user=self.instance.user).exists():
+            raise ValidationError('email already exist')
+        return data
+
+    def update(self, userprofile, validated_data):
+        # Update the User and UserProfile from validated_data
+        user_data = validated_data.pop('user', {})
+        userprofile.user.username = user_data.get('username', userprofile.user.username)
+        userprofile.user.save()
+
+        for attr, value in validated_data.items():
+            setattr(userprofile, attr, value)
+        userprofile.save()
+
+        return userprofile

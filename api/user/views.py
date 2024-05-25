@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from administration.models import UserProfile
 from django.contrib.auth.models import User
-from api.user.serializers import UserProfileSerializer, UserProfileCreateSerializer
+from api.user.serializers import UserProfileSerializer, UserProfileCreateSerializer, UserProfileUpdateSerializer
 
 class UserProfileViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin):
     # user profile view set with list, retrieve, create, update, destroy actions
@@ -14,8 +14,14 @@ class UserProfileViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, Cre
     lookup_field = 'user__username'
 
     def get_serializer_class(self):
+        # get serializer class based on action
         if self.action == "create":
             return UserProfileCreateSerializer
+
+
+        if self.request.method in ['PUT', 'PATCH']:
+            return UserProfileUpdateSerializer
+
         return UserProfileSerializer
 
     @action(detail=False, methods=['get'], url_path='me')
@@ -25,13 +31,3 @@ class UserProfileViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, Cre
         profile = UserProfile.objects.get(user=user)
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
-
-    # @action(detail=False, methods=['get'], url_path='test')
-    # def test(self, request):
-    #     # get current user profile
-    #     user = User.objects.get(username='user2')
-    #     profile = UserProfile.objects.get(user=user)
-    #     serializer = UserProfileSerializer(profile)
-    #     print(user.shared_workspaces.all())
-    #     return Response(serializer.data)
-
