@@ -101,9 +101,11 @@ class TaskUpdateSerializer(serializers.Serializer):
         # Ensure the user can only update a task for their units
         unit = data.get('unit')
         try:
-            unit = int(unit)
+            unit = int(unit['id'])
+            print(unit)
         except:
             raise serializers.ValidationError('Invalid unit id')
+
         user = self.context['request'].user
         if not user.units.filter(id=unit).exists():
             raise serializers.ValidationError('You can only update task for your units')
@@ -115,7 +117,7 @@ class TaskUpdateSerializer(serializers.Serializer):
         # set addressed_to field if exists
         # set owner, unit, workspace fields
         validated_data.pop('addressed_to', None) # to be build later 
-        validated_data['unit'] = self.context['request'].user.units.filter(id=validated_data['unit']).first()
+        validated_data['unit'] = self.context['request'].user.units.filter(id=validated_data['unit']['id']).first()
         for key, value in validated_data.items():
             setattr(task, key, value)
         task.save()
