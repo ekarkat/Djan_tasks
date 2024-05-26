@@ -23,12 +23,5 @@ class TaskViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateMode
             return TaskUpdateSerializer
         return TaskSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({
-            "request": self.request
-        })
-        return context
-
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
