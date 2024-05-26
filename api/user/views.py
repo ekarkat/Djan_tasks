@@ -18,7 +18,6 @@ class UserProfileViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, Cre
         if self.action == "create":
             return UserProfileCreateSerializer
 
-
         if self.request.method in ['PUT', 'PATCH']:
             return UserProfileUpdateSerializer
 
