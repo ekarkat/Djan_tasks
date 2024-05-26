@@ -23,6 +23,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserProfileCreateSerializer(serializers.Serializer):
     # user profile create serializer with
+
     username = serializers.CharField()
     password = serializers.CharField()
     confirm_password = serializers.CharField()
@@ -30,6 +31,7 @@ class UserProfileCreateSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     phone = serializers.CharField()
+    image = serializers.ImageField(required=False)
 
     class Meta:
         # model = UserProfile
@@ -41,9 +43,12 @@ class UserProfileCreateSerializer(serializers.Serializer):
             'first_name',
             'last_name',
             'phone',
+            'image',
         )
 
     def validate(self, data):
+        # Ensure the new email, username is not already in use by another user
+
         if User.objects.filter(username=data.get('username')).exists():
             raise ValidationError('username already exist')
 
@@ -56,6 +61,8 @@ class UserProfileCreateSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        # Create a new user and user profile
+        # print(validated_data)
         password = validated_data.pop('password')
         username = validated_data.pop('username')
         _ = validated_data.pop('confirm_password')
@@ -65,22 +72,26 @@ class UserProfileCreateSerializer(serializers.Serializer):
         return instance
 
     def to_representation(self, instance):
+        # return the user profile data
         return UserProfileSerializer(instance).data
 
 
 class UserProfileUpdateSerializer(serializers.Serializer):
+    # user profile update serializer
+
     username = serializers.CharField(source='user.username')
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     phone = serializers.CharField()
+    image = serializers.ImageField(required=False)
 
     class Meta:
-        fields = ['username', 'email', 'first_name', 'last_name', 'phone']
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'image']
 
     def validate(self, data):
         # Ensure the new email, username is not already in use by another user
-        print(self.instance)
+
         if User.objects.filter(username=data.get('user').get('username')).exists() and data.get('user').get('username') != self.instance.user.username:
             raise ValidationError('username already exist')
 
@@ -90,6 +101,7 @@ class UserProfileUpdateSerializer(serializers.Serializer):
 
     def update(self, userprofile, validated_data):
         # Update the User and UserProfile from validated_data
+
         user_data = validated_data.pop('user', {})
         userprofile.user.username = user_data.get('username', userprofile.user.username)
         userprofile.user.save()
