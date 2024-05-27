@@ -46,6 +46,9 @@ class TaskCreateSerializer(serializers.Serializer):
 
     def validate(self, data):
         # Ensure the user can only create task for their units
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError('You must be authenticated to create a unit')
 
         unit = data.get('unit')
         try:
@@ -53,7 +56,6 @@ class TaskCreateSerializer(serializers.Serializer):
         except:
             raise serializers.ValidationError('Invalid unit id')
 
-        user = self.context['request'].user
         if not user.units.filter(id=unit).exists():
             raise serializers.ValidationError('You can only create task for your units')
         return data
@@ -99,6 +101,9 @@ class TaskUpdateSerializer(serializers.Serializer):
 
     def validate(self, data):
         # Ensure the user can only update a task for their units
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError('You must be authenticated to create a unit')
         unit = data.get('unit')
         try:
             unit = int(unit['id'])
@@ -106,7 +111,6 @@ class TaskUpdateSerializer(serializers.Serializer):
         except:
             raise serializers.ValidationError('Invalid unit id')
 
-        user = self.context['request'].user
         if not user.units.filter(id=unit).exists():
             raise serializers.ValidationError('You can only update task for your units')
 
@@ -123,3 +127,6 @@ class TaskUpdateSerializer(serializers.Serializer):
         task.save()
 
         return task
+
+    def to_representation(self, instance):
+        return TaskSerializer(instance).data
