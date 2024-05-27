@@ -1,12 +1,12 @@
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from api.workspace.serializers import WorkspaceSerializer, WorkspaceCreateSerializer, WorkspaceUpdateSerializer
 from taskmanager.models import Workspace
 
 
-class WorkspaceViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin):
+class WorkspaceViewSet(viewsets.ModelViewSet):
     # workspace view set with list, retrieve, create, update, destroy actions
     permission_classes = [IsAuthenticated]
     queryset = Workspace.objects.all()

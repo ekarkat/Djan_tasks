@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import UserProfile
 
 
-class UserProfileForm(forms.ModelForm):
+class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     username = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))

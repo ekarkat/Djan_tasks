@@ -2,19 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 
-from .forms import UserProfileForm, LoginForm
+from .forms import RegisterForm, LoginForm
 
 # Create your views here.
 def register(request):
     if request.method == 'POST':
-        form = UserProfileForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
             return render(request, 'administration/register_success.htm')
 
         return render(request, 'administration/register.htm', context={'form': form})
 
-    form = UserProfileForm()
+    form = RegisterForm()
     return render(request, 'administration/register.htm', context={'form': form})
 
 

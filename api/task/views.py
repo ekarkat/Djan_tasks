@@ -1,12 +1,12 @@
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from api.task.serializers import TaskSerializer, TaskCreateSerializer, TaskUpdateSerializer
 from taskmanager.models import Task
 
 
-class TaskViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin):
+class TaskViewSet(viewsets.ModelViewSet):
     # user profile view set with list, retrieve, create, update, destroy actions
     permission_classes = [IsAuthenticated]
     queryset = Task.objects.all()
