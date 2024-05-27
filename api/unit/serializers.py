@@ -37,7 +37,10 @@ class UnitCreateSerializer(serializers.Serializer):
         )
 
     def validate(self, data):
-    #     # Ensure the user can only create unit for their workspaces
+        # Ensure the user can only create unit for their workspaces
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError('You must be authenticated to create a unit')
         workspace = data.get('workspace')
         try:
             workspace = int(workspace)
@@ -76,7 +79,10 @@ class UnitUpdateSerializer(serializers.Serializer):
         )
 
     def validate(self, data):
-    #     # Ensure the user can only create unit for their workspaces
+        # Ensure the user can only create unit for their workspaces
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError('You must be authenticated to create a unit')
         workspace = data.get('workspace')
         try:
             workspace = int(workspace)

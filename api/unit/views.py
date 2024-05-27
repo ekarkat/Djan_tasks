@@ -1,7 +1,6 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from api.unit.serializers import UnitSerializer, UnitCreateSerializer, UnitUpdateSerializer
 from taskmanager.models import Unit
@@ -9,6 +8,7 @@ from taskmanager.models import Unit
 
 class UnitViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin):
     # user profile view set with list, retrieve, create, update, destroy actions
+    permission_classes = [IsAuthenticated]
     queryset = Unit.objects.all()
     # serializer_class = UnitSerializer
     # lookup_field = 'user__username'
