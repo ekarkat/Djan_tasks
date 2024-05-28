@@ -44,12 +44,20 @@ This is a simple Django application that manage tasks
     CREATE USER djantask_user WITH PASSWORD 'djan_admin';
     GRANT ALL PRIVILEGES ON DATABASE djantask_db TO djantask_user;
     ```
+    setup database
+    ```
+    ./manage.py makemigrations
+    ```
+
+    ```
+    ./manage.py migrate
+    ```
 
 6. Run the Django application:
-
+    
     ```
     ./manage.py runserver
-    ```
+    ```    
 
 7. Open your web browser and go to `http://127.0.0.1/8000` to see the application running.
 
