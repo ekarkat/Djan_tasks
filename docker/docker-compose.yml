@@ -1,14 +1,27 @@
 services:
   db:
-    image: postgres
+    container_name: djan_db
+    image: postgres:16.3-alpine3.20
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
+  redis:
+    container_name: djan_redis
+    image: redis:7.2.5-alpine3.20
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
   web:
-    build: .
+    container_name: DjanTask
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
@@ -20,3 +33,4 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+      - redis

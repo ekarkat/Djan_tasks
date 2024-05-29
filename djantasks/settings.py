@@ -80,10 +80,9 @@ WSGI_APPLICATION = 'djantasks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'djantask_db',
-        'USER': 'djantask_user',
-        'PASSWORD': 'djan_admin',
-        'HOST': 'localhost',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
         'PORT': '5432',
     }
 }

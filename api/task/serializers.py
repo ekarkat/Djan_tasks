@@ -7,7 +7,7 @@ from taskmanager.models import Task, Unit, Workspace
 class TaskSerializer(serializers.ModelSerializer):
     # task serializer with id, title, description, created_at, updated_at, due_date, status fields
     owner = serializers.CharField(source='owner.username', read_only=True)
-    workspace = serializers.CharField(source='workspace.id' ,read_only=True)
+    workspace = serializers.IntegerField(source='workspace.id' ,read_only=True)
 
     class Meta:
         model = Task
@@ -15,7 +15,6 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(TaskSerializer, self).__init__(*args, **kwargs)
-
         # Check if 'request' is in the context and adjust the queryset for 'unit'
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
@@ -35,7 +34,7 @@ class TaskSerializer(serializers.ModelSerializer):
         # create task
         # manually set owner, workspace fields
         # set addressed_to field if exists
-        print(validated_data)
+
         validated_data.pop('addressed_to', None)
         validated_data['owner'] = self.context['request'].user
         validated_data['workspace'] = validated_data['unit'].workspace
