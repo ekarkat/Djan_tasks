@@ -38,4 +38,4 @@ class LoginFormTest(TestCase):
     def test_login_form_invalid_data(self):
         form = LoginForm(data={})
         self.assertFalse(form.is_valid())
-        self.assertEqual(len(form.errors), 2)
+        self.assertEqual(len(form.errors), 2) # username and password required
