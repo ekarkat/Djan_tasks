@@ -99,3 +99,8 @@ class UserProfileViewsTest(TestCase):
         response = self.client.get(reverse('administration:login'))
         self.assertRedirects(response, reverse('core:home'))
     
+    def test_logout_view(self):
+        """Logout Test check"""
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.get(reverse('administration:logout'))
+        self.assertRedirects(response, reverse('core:home'))
