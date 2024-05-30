@@ -17,6 +17,7 @@ RUN python -m pip install --upgrade pip
 COPY ../requirements.txt .
 
 RUN pip install -r requirements.txt
-RUN adduser -u 999 -S appuser -s /bin/sh
 
 COPY .. .
+
+RUN chmod +x docker/entrypoint.sh
