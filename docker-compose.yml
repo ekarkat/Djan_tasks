@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    container_name: TaskManager-db
+    container_name: DjanTask-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -16,7 +16,7 @@ services:
       - app_network
 
   web:
-    container_name: TaskManager-web
+    container_name: DjanTask-web
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -24,7 +24,7 @@ services:
     volumes:
       - .:/src
     ports:
-      - "8000:8000"
+      - "8000:8001"
     env_file:
       - env/.env.dev
     depends_on:
