@@ -37,7 +37,6 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data.pop('owner', None)
-        print(validated_data)
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()

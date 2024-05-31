@@ -9,11 +9,10 @@ class UnitSerializer(serializers.ModelSerializer):
 
     members = serializers.SerializerMethodField()
     owner = serializers.CharField(source='owner.username', read_only=True)
-    status = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Unit
-        fields = ['id', 'owner', 'workspace', 'title', 'description', 'created_at', 'members', 'status']
+        fields = ['id', 'owner', 'workspace', 'title', 'description', 'created_at', 'members']
 
     def get_members(self, obj):
         members = obj.members.all()

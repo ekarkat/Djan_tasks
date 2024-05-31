@@ -17,7 +17,6 @@ class Workspace(BaseModel):
     description = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workspaces')
     members = models.ManyToManyField(User, related_name='shared_workspaces', blank=True)
-    status = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return self.title + ' - ' + self.owner.username
@@ -52,7 +51,6 @@ class Unit(BaseModel):
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='units')
     members = models.ManyToManyField(User, related_name='shared_units', blank=True)
-    status = models.FloatField(blank=True, null=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='units')
 
     class Meta:
@@ -121,6 +119,21 @@ class Task(BaseModel):
 
         return instance
 
+    def update(self, *args, **kwargs):
+        if self.status == Task.StatusChoices.CLOSED:
+            return self
+        if self.pk is None:
+            instance = super(Task, self).save()
+        else:
+            if kwargs.get('status') == 'CL':
+                self.status = Task.StatusChoices.CLOSED
+                super(Task, self).save()
+            else:
+                self.status = kwargs.get('status')
+                super(Task, self).save()
+
+        return instance
+
 
 class WorkSpaceComment(BaseModel):
     # comment class with workspace and user fields
@@ -183,3 +196,19 @@ class TaskRequest(BaseModel):
     def __str__(self):
         out = self.task.title + ' - ' + self.user.username
         return out
+
+    def update(self, *args, **kwargs):
+        if self.answer == TaskRequest.StatusChoices.ACCEPTED:
+            return self
+        if self.pk is None:
+            instance = super(TaskRequest, self).save()
+        else:
+            if kwargs.get('answer') == 'AC':
+                self.task.addressed_to = self.to_user
+                self.task.save()
+                self.answer = TaskRequest.StatusChoices.ACCEPTED
+                super(TaskRequest, self).save()
+            else:
+                self.answer = kwargs.get('answer')
+                super(TaskRequest, self).save()
+

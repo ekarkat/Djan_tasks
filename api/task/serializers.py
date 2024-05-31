@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from taskmanager.models import Task, Unit, Workspace
+from taskmanager.models import Task, Unit, Workspace, TaskRequest
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -35,10 +35,13 @@ class TaskSerializer(serializers.ModelSerializer):
         # manually set owner, workspace fields
         # set addressed_to field if exists
 
-        validated_data.pop('addressed_to', None)
+        addressed_to = validated_data.pop('addressed_to', None)
         validated_data['owner'] = self.context['request'].user
         validated_data['workspace'] = validated_data['unit'].workspace
-        return Task.objects.create(**validated_data)
+        task = Task.objects.create(**validated_data)
+        if addressed_to:
+            task_request = TaskRequest.objects.create(task=task, to_user=addressed_to, from_user=self.context['request'].user)
+        return task
 
     def update(self, instance, validated_data):
         # update task
