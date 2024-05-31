@@ -28,7 +28,7 @@ class Workspace(BaseModel):
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
         else:
             instance = super(Workspace, self).save()
-            text = f"Updated by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         WorkSpaceComment.objects.create(workspace=self, user=self.owner, text=text)
 
@@ -61,7 +61,7 @@ class Unit(BaseModel):
         ordering = ['created_at']
 
     def __str__(self):
-        return (self.title + ' - ' + self.owner.username)
+        return (self.title + ' - '  + self.workspace.title + ' - ' + self.owner.username)
 
     def save(self, *args, **kwargs):
         if self.pk is None:

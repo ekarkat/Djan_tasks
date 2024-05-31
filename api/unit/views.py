@@ -3,18 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from taskmanager.models import Unit
-from .serializers import UnitSerializer, UnitCreateSerializer, UnitUpdateSerializer
+from .serializers import UnitSerializer
+from api.permissions import IsOwnerOrReadOnly
 
 class UnitViewSet(viewsets.ModelViewSet):
     queryset = Unit.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return UnitCreateSerializer
-        elif self.action in ['update', 'partial_update']:
-            return UnitUpdateSerializer
-        return UnitSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    serializer_class = UnitSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -23,8 +18,3 @@ class UnitViewSet(viewsets.ModelViewSet):
         })
         return context
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(owner=self.request.user)
