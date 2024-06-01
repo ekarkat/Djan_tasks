@@ -189,26 +189,26 @@ class TaskRequest(BaseModel):
         REJECTED = 'RJ', 'Rejected'
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='requests')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_requests')
     answer = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)
 
     def __str__(self):
-        out = self.task.title + ' - ' + self.user.username
+        out = self.task.title + ' - ' + self.owner.username
         return out
 
     def update(self, *args, **kwargs):
+        # address a task to a user in case answer is 'AC'
+        # in case answer = yes task allready addressed to a user and 
+        # the answer is 'AC' return the task request
         if self.answer == TaskRequest.StatusChoices.ACCEPTED:
             return self
-        if self.pk is None:
-            instance = super(TaskRequest, self).save()
         else:
             if kwargs.get('answer') == 'AC':
-                self.task.addressed_to = self.to_user
+                self.task.addressed_to = self.owner
                 self.task.save()
                 self.answer = TaskRequest.StatusChoices.ACCEPTED
                 super(TaskRequest, self).save()
             else:
                 self.answer = kwargs.get('answer')
                 super(TaskRequest, self).save()
-

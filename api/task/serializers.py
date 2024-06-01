@@ -40,18 +40,20 @@ class TaskSerializer(serializers.ModelSerializer):
         validated_data['workspace'] = validated_data['unit'].workspace
         task = Task.objects.create(**validated_data)
         if addressed_to:
-            task_request = TaskRequest.objects.create(task=task, to_user=addressed_to, from_user=self.context['request'].user)
+            task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
         return task
 
-    def update(self, instance, validated_data):
+    def update(self, task, validated_data):
         # update task
         # set addressed_to field if exists
-
+        addressed_to = validated_data.pop('addressed_to', None)
         for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
+            setattr(task, key, value)
+        task.save()
+        if addressed_to:
+            task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
 
-        return instance
+        return task
 
 
 # class TaskCreateSerializer(serializers.Serializer):

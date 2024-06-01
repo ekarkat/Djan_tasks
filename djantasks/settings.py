@@ -37,10 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'rest_framework',
-	'core',
-	'administration',
 	'taskmanager',
+	'administration',
+	'core',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -95,7 +95,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'djantask_db',
+            'NAME': 'djantask',
             'USER': 'djantask_user',
             'PASSWORD': 'djan_admin',
             'HOST': 'localhost',

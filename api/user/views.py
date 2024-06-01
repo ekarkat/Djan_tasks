@@ -2,9 +2,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from administration.models import UserProfile
 from django.contrib.auth.models import User
+from administration.models import UserProfile
 from api.user.serializers import UserProfileSerializer, UserProfileCreateSerializer, UserProfileUpdateSerializer
+from api.generic.serializers import TaskRequestSerializer
+from taskmanager.models import TaskRequest
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     # user profile view set with list, retrieve, create, update, destroy actions
@@ -26,4 +28,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         user = request.user
         profile = UserProfile.objects.get(user=user)
         serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='sent_requests')
+    def sent_requests(self, request):
+        # get current user sent requests
+        user = request.user
+        sent_requests = TaskRequest.objects.filter(from_user=user).all()
+        serializer = TaskRequestSerializer(sent_requests, many=True)
         return Response(serializer.data)
