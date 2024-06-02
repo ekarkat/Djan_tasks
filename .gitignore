@@ -3,3 +3,4 @@ te.py
 static
 staticfiles
 abcx.py
+celerybeat-schedule

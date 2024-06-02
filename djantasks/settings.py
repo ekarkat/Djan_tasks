@@ -183,3 +183,9 @@ CELERY_RESULT_BACKEND = 'django-db'
 
 # Celery Beat Settings
 
+CELERY_BEAT_SCHEDULE = {
+    'test-celery-beat': {
+        'task': 'taskmanager.tasks.delete_acepted_requests',
+        'schedule': 21600,
+    },
+}

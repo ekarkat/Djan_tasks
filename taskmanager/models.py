@@ -69,7 +69,7 @@ class Unit(BaseModel):
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
         else:
             instance = super(Unit, self).save()
-            text = f"Created by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updates by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         UnitComment.objects.create(unit=self, user=self.owner, text=text)
 
@@ -115,26 +115,26 @@ class Task(BaseModel):
 
         else:
             instance = super(Task, self).save()
-            text = f"Created by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         TaskComment.objects.create(task=self, user=self.owner, text=text)
 
         return instance
 
-    def update(self, *args, **kwargs):
-        if self.status == Task.StatusChoices.CLOSED:
-            return self
-        if self.pk is None:
-            instance = super(Task, self).save()
-        else:
-            if kwargs.get('status') == 'CL':
-                self.status = Task.StatusChoices.CLOSED
-                super(Task, self).save()
-            else:
-                self.status = kwargs.get('status')
-                super(Task, self).save()
+    # def update(self, *args, **kwargs):
+    #     if self.status == Task.StatusChoices.CLOSED:
+    #         return self
+    #     if self.pk is None:
+    #         instance = super(Task, self).save()
+    #     else:
+    #         if kwargs.get('status') == 'CL':
+    #             self.status = Task.StatusChoices.CLOSED
+    #             super(Task, self).save()
+    #         else:
+    #             self.status = kwargs.get('status')
+    #             super(Task, self).save()
 
-        return instance
+        # return instance
 
 
 class WorkSpaceComment(BaseModel):

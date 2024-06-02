@@ -17,7 +17,6 @@ class TaskRequestViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='received_requests')
     def received_requests(self, request):
         # get current user recieved requests
-        # celery task test
         user = request.user
         addressed_tasks = TaskRequest.objects.filter(owner=user).all()
         serializer = TaskRequestSerializer(addressed_tasks, many=True)

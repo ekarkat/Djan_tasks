@@ -3,12 +3,14 @@ from .models import TaskRequest
 
 @shared_task(bind=True)
 def test_task(self):
-    print(f'Request: {self.request!r}')
-    for i in range(10):
+    for i in range(2):
         print(i)
     return 'Task executed successfully!'
 
 @shared_task(bind=True)
-def delete_requests(self):
-    TaskRequest.objects.filter(answer='AC').delete()
-    return 'Accepted TaskRequest deleted successfully!'
+def delete_acepted_requests(self):
+    accepted_tasks = TaskRequest.objects.filter(answer='AC')
+    if accepted_tasks:
+        number = len(accepted_tasks)
+        accepted_tasks.delete()
+    return f'{number} Accepted TaskRequests deleted successfully!'
