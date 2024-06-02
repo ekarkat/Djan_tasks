@@ -33,7 +33,7 @@ class TaskSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # create task
         # manually set owner, workspace fields
-        # set addressed_to field if exists
+        # create a task request if addressed_to != None
 
         addressed_to = validated_data.pop('addressed_to', None)
         validated_data['owner'] = self.context['request'].user
@@ -45,7 +45,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def update(self, task, validated_data):
         # update task
-        # set addressed_to field if exists
+        # create a task request if addressed_to != None
+
+        if task.owner != self.context['request'].user:
+            # Ensure the user can only update their tasks
+            raise serializers.ValidationError('You can only update your tasks')
         addressed_to = validated_data.pop('addressed_to', None)
         for key, value in validated_data.items():
             setattr(task, key, value)

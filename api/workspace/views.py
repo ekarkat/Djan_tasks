@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from api.workspace.serializers import WorkspaceSerializer
 from taskmanager.models import Workspace
@@ -20,3 +21,11 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
             'request': self.request,
         })
         return context
+
+    @action(detail=False, methods=['get'], url_path='my_workspaces')
+    def my_workspaces(self, request):
+        # get current user workspaces
+        user = request.user
+        workspaces = Workspace.objects.filter(owner=user).all()
+        serializer = WorkspaceSerializer(workspaces, many=True)
+        return Response(serializer.data)

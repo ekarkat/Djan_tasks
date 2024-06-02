@@ -20,12 +20,9 @@ class TaskRequestSerializer(serializers.ModelSerializer):
         fields = ['id', 'task', 'from_user', 'owner', 'answer']
 
     def create(self, validated_data):
-        # userrequest shouldnt be created from serializer
-        return self
+        raise serializers.ValidationError("Creating TaskRequest objects is not allowed.")
 
-    def update(self, instance, validated_data):
-        # update task request
-        # set answer field
-        instance.update(**validated_data)
-        return instance
-
+    def update(self, taskrequest, validated_data):
+        # update the request status
+        taskrequest.update(**validated_data)
+        return taskrequest

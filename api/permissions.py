@@ -12,5 +12,7 @@ class IsOwnerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        # Write permissions are only allowed to the owner of the task.
+        # Write permissions are only allowed to the owner or addressed to.
+        if hasattr(obj, 'addressed_to'):
+            return (obj.owner == request.user) or (obj.addressed_to == request.user)
         return obj.owner == request.user

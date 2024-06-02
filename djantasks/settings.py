@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-	'taskmanager',
-	'administration',
-	'core',
+    'taskmanager',
+    'administration',
+    'core',
     'rest_framework',
+    'django_celery_results',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -103,6 +105,8 @@ else:
         }
     }
 
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -161,3 +165,21 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10,
     'DATETIME_FORMAT': DEFAULT_DATETIME_FORMAT,
 }
+
+
+
+# set redis cache
+
+
+# Celery Settings
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+# Celery Beat Settings
+

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.task.serializers import TaskSerializer
@@ -22,3 +23,13 @@ class TaskViewSet(viewsets.ModelViewSet):
             'request': self.request,
         })
         return context
+
+    @action(detail=False, methods=['get'], url_path='my_tasks')
+    def my_tasks(self, request):
+        # get current user tasks
+        user = request.user
+        tasks = Task.objects.filter(owner=user).all()
+        addressed_tasks = Task.objects.filter(addressed_to=user).all()
+        tasks = tasks | addressed_tasks
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)

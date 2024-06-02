@@ -30,10 +30,3 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='sent_requests')
-    def sent_requests(self, request):
-        # get current user sent requests
-        user = request.user
-        sent_requests = TaskRequest.objects.filter(from_user=user).all()
-        serializer = TaskRequestSerializer(sent_requests, many=True)
-        return Response(serializer.data)
