@@ -29,12 +29,28 @@ services:
     networks:
       - app_network
 
-  celery:
-    container_name: DjanTask-celery
+  celery-beat:
+    container_name: DjanTask-celery-beat
     build:
       context: .
       dockerfile: docker/Dockerfile
-    entrypoint: /home/app/celery_enterypoint.sh
+    command: celery -A djantasks beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    env_file:
+      - env/.env.dev
+    volumes:
+      - .:/home/app/
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+
+  celery-worker:
+    container_name: DjanTask-celery-worker
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A djantasks worker -l INFO --autoscale=4,1
     env_file:
       - env/.env.dev
     volumes:

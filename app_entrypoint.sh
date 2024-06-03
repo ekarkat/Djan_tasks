@@ -1,4 +1,5 @@
 #!/bin/sh
+# entry point to  start migrations
 
 echo "Apply database migration and run server"
 

@@ -189,3 +189,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 21600,
     },
 }
+
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
