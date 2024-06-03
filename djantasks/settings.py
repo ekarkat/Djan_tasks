@@ -181,10 +181,10 @@ CELERY_TIMEZONE = 'UTC'
 
 CELERY_RESULT_BACKEND = 'django-db'
 
-# Celery Beat Settings
+# Celery Beat Settings perdiodid task
 
 CELERY_BEAT_SCHEDULE = {
-    'test-celery-beat': {
+    'remove-accepted-requests': {
         'task': 'taskmanager.tasks.delete_acepted_requests',
         'schedule': 21600,
     },

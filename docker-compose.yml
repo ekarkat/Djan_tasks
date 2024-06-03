@@ -18,7 +18,7 @@ services:
       dockerfile: docker/Dockerfile
     entrypoint: /home/app/app_entrypoint.sh
     env_file:
-      - env/.env.dev    
+      - env/.env.dev
     volumes:
       - .:/home/app/
     ports:
@@ -36,7 +36,7 @@ services:
       dockerfile: docker/Dockerfile
     entrypoint: /home/app/celery_enterypoint.sh
     env_file:
-      - env/.env.dev    
+      - env/.env.dev
     volumes:
       - .:/home/app/
     depends_on:
@@ -44,7 +44,6 @@ services:
       - redis
     networks:
       - app_network
-
 
   redis:
     image: redis:7.0.12-alpine3.18
