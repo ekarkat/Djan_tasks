@@ -18,6 +18,4 @@ def create_workspace(request):
             return redirect('admin')  # Redirect to a new URL
     else:
         form = WorkSpaceForm(user=request.user)
-    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    print(request.user)
     return render(request, 'taskmanager/create_workspace.html', context={'form': form})

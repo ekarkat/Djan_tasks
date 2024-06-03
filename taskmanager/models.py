@@ -28,7 +28,7 @@ class Workspace(BaseModel):
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
         else:
             instance = super(Workspace, self).save()
-            text = f"Updated by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         WorkSpaceComment.objects.create(workspace=self, user=self.owner, text=text)
 
@@ -52,8 +52,8 @@ class Unit(BaseModel):
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='units')
     members = models.ManyToManyField(User, related_name='shared_units', blank=True)
-    status = models.FloatField(blank=True, null=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='units')
+    status = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Unit'
@@ -61,7 +61,7 @@ class Unit(BaseModel):
         ordering = ['created_at']
 
     def __str__(self):
-        return (self.title + ' - ' + self.owner.username)
+        return (self.title + ' - '  + self.workspace.title + ' - ' + self.owner.username)
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -69,7 +69,7 @@ class Unit(BaseModel):
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
         else:
             instance = super(Unit, self).save()
-            text = f"Created by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updates by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         UnitComment.objects.create(unit=self, user=self.owner, text=text)
 
@@ -115,11 +115,26 @@ class Task(BaseModel):
 
         else:
             instance = super(Task, self).save()
-            text = f"Created by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
         TaskComment.objects.create(task=self, user=self.owner, text=text)
 
         return instance
+
+    # def update(self, *args, **kwargs):
+    #     if self.status == Task.StatusChoices.CLOSED:
+    #         return self
+    #     if self.pk is None:
+    #         instance = super(Task, self).save()
+    #     else:
+    #         if kwargs.get('status') == 'CL':
+    #             self.status = Task.StatusChoices.CLOSED
+    #             super(Task, self).save()
+    #         else:
+    #             self.status = kwargs.get('status')
+    #             super(Task, self).save()
+
+        # return instance
 
 
 class WorkSpaceComment(BaseModel):
@@ -170,16 +185,32 @@ class TaskRequest(BaseModel):
     # each task request has a status field to show the status of the request
     # a user can access their requests by user.sent_requests.all()
 
-    class StatusChoices(models.TextChoices):
+    class AnswerChoices(models.TextChoices):
         PENDING = 'PD', 'Pending'
         ACCEPTED = 'AC', 'Accepted'
         REJECTED = 'RJ', 'Rejected'
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='requests')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests') # owner = addressed_to
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_requests')
-    answer = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    answer = models.CharField(max_length=20, choices=AnswerChoices.choices, default=AnswerChoices.PENDING)
 
     def __str__(self):
-        out = self.task.title + ' - ' + self.user.username
+        out = self.task.title + ' - ' + self.owner.username
         return out
+
+    def update(self, *args, **kwargs):
+        # address a task to a user in case answer is 'AC'
+
+        if self.answer == TaskRequest.AnswerChoices.ACCEPTED:
+            # if the answer for the task is already = Accepted, dont do anything
+            return self
+        else:
+            if kwargs.get('answer') == 'AC':
+                self.task.addressed_to = self.owner
+                self.task.save()
+                self.answer = TaskRequest.AnswerChoices.ACCEPTED
+                super(TaskRequest, self).save()
+            else:
+                self.answer = kwargs.get('answer')
+                super(TaskRequest, self).save()

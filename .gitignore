@@ -1,2 +1,6 @@
 __pycache__
 te.py
+static
+staticfiles
+abcx.py
+celerybeat-schedule

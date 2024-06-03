@@ -2,9 +2,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from administration.models import UserProfile
 from django.contrib.auth.models import User
+from administration.models import UserProfile
 from api.user.serializers import UserProfileSerializer, UserProfileCreateSerializer, UserProfileUpdateSerializer
+from api.generic.serializers import TaskRequestSerializer
+from taskmanager.models import TaskRequest
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     # user profile view set with list, retrieve, create, update, destroy actions
@@ -27,3 +29,4 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         profile = UserProfile.objects.get(user=user)
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
+
