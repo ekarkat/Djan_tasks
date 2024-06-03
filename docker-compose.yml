@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13
+    image: postgres:16.3-alpine3.20
     container_name: DjanTask-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -16,16 +16,42 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    entrypoint: /home/app/app_entrypoint.sh
+    env_file:
+      - env/.env.dev    
     volumes:
-      - .:/src
+      - .:/home/app/
     ports:
       - "8001:8000"
-    env_file:
-      - env/.env.dev
     depends_on:
       - db
+      - redis
     networks:
       - app_network
+
+  celery:
+    container_name: DjanTask-celery
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    entrypoint: /home/app/celery_enterypoint.sh
+    env_file:
+      - env/.env.dev    
+    volumes:
+      - .:/home/app/
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+
+
+  redis:
+    image: redis:7.0.12-alpine3.18
+    container_name: DjanTask-redis
+    networks:
+      - app_network
+
 
 volumes:
   postgres_data:
