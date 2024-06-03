@@ -104,8 +104,21 @@ else:
             'PORT': '5432',
         }
     }
-
-
+# Test configuration solution for the troubleshoot bellow:
+# Creating test database for alias 'default' ('test_djantask_db')...
+# Got an error creating the test database: permission denied to create database
+import sys
+if 'test' in sys.argv:
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'djantask_db',
+        'USER': 'djantask_user',
+        'PASSWORD': 'djan_admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
