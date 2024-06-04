@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -28,6 +29,8 @@ class TaskSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if not user.units.filter(id=data['unit'].id).exists():
             raise serializers.ValidationError('You can only create task for your units')
+        if data.get('deadline') and data['deadline'] < timezone.now():
+            raise serializers.ValidationError('Deadline cannot be in the past')
         return data
 
     def create(self, validated_data):

@@ -1,3 +1,6 @@
+import json
+
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import BaseModel
@@ -88,6 +91,7 @@ class Task(BaseModel):
         OPEN = 'OP', 'Open'
         IN_PROGRESS = 'IN', 'In Progress'
         CLOSED = 'CL', 'Closed'
+        EXPIRED = 'EX', 'Expired'
 
     class PriorityChoices(models.TextChoices):
         LOW = 'LW', 'Low'
@@ -96,7 +100,7 @@ class Task(BaseModel):
 
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    deadline = models.DateField(blank=True, null=True)
+    deadline = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
     addressed_to = models.ForeignKey(User, related_name='addressed_tasks', on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.OPEN)
@@ -112,14 +116,55 @@ class Task(BaseModel):
         if self.pk is None:
             instance = super(Task, self).save()
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
-
+            if self.deadline:
+                PeriodicTask.objects.create(
+                        crontab= CrontabSchedule.objects.create(
+                        minute = self.deadline.minute,
+                        hour = self.deadline.hour,
+                        day_of_month = self.deadline.day,
+                        month_of_year = self.deadline.month,
+                    ),
+                    name = f'{self.id}',
+                    task = 'taskmanager.tasks.check_deadline',
+                    kwargs = json.dumps({'task_id': self.id}),
+                    enabled = True,
+                    one_off=True
+                )
         else:
             instance = super(Task, self).save()
             text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            if self.deadline:
+                try:
+                    periodic_task = PeriodicTask.objects.get(name=f'{self.id}')
+                    periodic_task.crontab, created = CrontabSchedule.objects.get_or_create(
+                        minute = self.deadline.minute,
+                        hour = self.deadline.hour,
+                        day_of_month = self.deadline.day,
+                        month_of_year = self.deadline.month,
+                    )
+                    periodic_task.enabled = True
+                    periodic_task.one_off = True
+                    periodic_task.save()
+                except PeriodicTask.DoesNotExist:
+                    PeriodicTask.objects.create(
+                        crontab, created = CrontabSchedule.objects.get_or_create(
+                            minute = self.deadline.minute,
+                            hour = self.deadline.hour,
+                            day_of_month = self.deadline.day,
+                            month_of_year = self.deadline.month,
+                        ),
+                        name = f'{self.id}',
+                        task = 'taskmanager.tasks.check_deadline',
+                        kwargs = json.dumps({'task_id': self.id}),
+                        enabled = True,
+                        one_off=True
+                    )
 
         TaskComment.objects.create(task=self, user=self.owner, text=text)
 
         return instance
+
+
 
     # def update(self, *args, **kwargs):
     #     if self.status == Task.StatusChoices.CLOSED:

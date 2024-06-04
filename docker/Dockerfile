@@ -18,6 +18,3 @@ COPY . .
 
 COPY docker/app_entrypoint.sh /home/app/app_entrypoint.sh
 RUN chmod +x /home/app/app_entrypoint.sh
-
-COPY docker/celery_enterypoint.sh /home/app/celery_enterypoint.sh
-RUN chmod +x /home/app/celery_enterypoint.sh

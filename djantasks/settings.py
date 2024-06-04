@@ -204,4 +204,5 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 # Email settings
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@localhost')
