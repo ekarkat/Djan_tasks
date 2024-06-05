@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from administration.models import UserProfile
 
 class IsOwnerOrReadOnly(BasePermission):
     """
@@ -15,4 +16,6 @@ class IsOwnerOrReadOnly(BasePermission):
         # Write permissions are only allowed to the owner or addressed to.
         if hasattr(obj, 'addressed_to'):
             return (obj.owner == request.user) or (obj.addressed_to == request.user)
+        if (isinstance(obj, UserProfile)):
+            return obj.user == request.user
         return obj.owner == request.user

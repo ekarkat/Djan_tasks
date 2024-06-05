@@ -20,12 +20,3 @@ class UserProfile(BaseModel):
     def __str__(self):
         out = f"id :{self.id} - {self.user.username}"
         return out
-
-    def address_to(self, task, user):
-        # address a task to a user
-        if User.objects.filter(id=user.id).exists() and self.user.id == task.owner.id:
-            if user.created_tasks.filter(id=task.id).exists():
-                task_request = TaskRequest.objects.create(task=task, owner=self.user, from_user=user)
-                return task_request
-        return None
-

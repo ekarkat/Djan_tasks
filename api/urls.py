@@ -5,7 +5,7 @@ from .user.views import UserProfileViewSet
 from .workspace.views import WorkspaceViewSet
 from .unit.views import UnitViewSet
 from .task.views import TaskViewSet
-from .generic.views import TaskRequestViewSet
+from .taskrequest.views import TaskRequestViewSet
 
 # urlpatterns = [
 #     path('users/', views.user_list, name='user_list'),

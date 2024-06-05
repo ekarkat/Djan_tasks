@@ -128,7 +128,7 @@ class Task(BaseModel):
                     task = 'taskmanager.tasks.check_deadline',
                     kwargs = json.dumps({'task_id': self.id}),
                     enabled = True,
-                    one_off=True
+                    one_off = True
                 )
         else:
             instance = super(Task, self).save()
@@ -164,22 +164,12 @@ class Task(BaseModel):
 
         return instance
 
-
-
-    # def update(self, *args, **kwargs):
-    #     if self.status == Task.StatusChoices.CLOSED:
-    #         return self
-    #     if self.pk is None:
-    #         instance = super(Task, self).save()
-    #     else:
-    #         if kwargs.get('status') == 'CL':
-    #             self.status = Task.StatusChoices.CLOSED
-    #             super(Task, self).save()
-    #         else:
-    #             self.status = kwargs.get('status')
-    #             super(Task, self).save()
-
-        # return instance
+    def address_this_task(self, user):
+        # address a task to a user
+        if User.objects.filter(id=user.id).exists():
+            task_request = TaskRequest.objects.create(task=slef, owner=user, from_user=self.owner)
+            return task_request
+        return None
 
 
 class WorkSpaceComment(BaseModel):

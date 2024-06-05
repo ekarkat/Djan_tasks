@@ -5,14 +5,14 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from administration.models import UserProfile
 from api.user.serializers import UserProfileSerializer, UserProfileCreateSerializer, UserProfileUpdateSerializer
-from api.generic.serializers import TaskRequestSerializer
-from taskmanager.models import TaskRequest
+from api.permissions import IsOwnerOrReadOnly
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     # user profile view set with list, retrieve, create, update, destroy actions
     queryset = UserProfile.objects.all()
-    # serializer_class = UserProfileSerializer # remove after using get_serializer_class
-    lookup_field = 'user__username'
+    # serializer_class = UserProfileSerializer # remove when using get_serializer_class
+    permission_classes = [IsOwnerOrReadOnly]
+    # lookup_field = 'user__username'
 
     def get_serializer_class(self):
         # get serializer class based on action

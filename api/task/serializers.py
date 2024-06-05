@@ -53,12 +53,22 @@ class TaskSerializer(serializers.ModelSerializer):
         if task.owner != self.context['request'].user:
             # Ensure the user can only update their tasks
             raise serializers.ValidationError('You can only update your tasks')
+
         addressed_to = validated_data.pop('addressed_to', None)
         for key, value in validated_data.items():
             setattr(task, key, value)
         task.save()
         if addressed_to:
-            task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
+            try:
+                task_request = TaskRequest.objects.get(task=task)
+                if task_request.owner != addressed_to:
+                    task_request.delete()
+                    task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=task.owner)
+                else:
+                    task_request.answer = TaskRequest.AnswerChoices.pending
+                    task_request.save()
+            except TaskRequest.DoesNotExist:
+                task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
 
         return task
 
