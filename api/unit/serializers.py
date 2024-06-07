@@ -22,9 +22,10 @@ class UnitSerializer(serializers.ModelSerializer):
         return members_output
 
     def __init__(self, *args, **kwargs):
-        super(UnitSerializer, self).__init__(*args, **kwargs)
+        # filter the workspace field based on the user
+        super().__init__(*args, **kwargs)
 
-        # Check if 'request' is in the context and adjust the queryset for 'unit'
+        # Check if 'request' is in the context and adjust the queryset for 'workspace'
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             self.fields['workspace'] = serializers.PrimaryKeyRelatedField(

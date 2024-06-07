@@ -14,8 +14,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ['id', 'owner', 'addressed_to', 'workspace', 'unit', 'title', 'description', 'created_at', 'deadline', 'status', 'priority']
 
-    def __init__(self, *args, **kwargs):
-        super(TaskSerializer, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):\
+        # filter the unit field based on the user
+        super().__init__(*args, **kwargs)
         # Check if 'request' is in the context and adjust the queryset for 'unit'
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
@@ -37,18 +38,17 @@ class TaskSerializer(serializers.ModelSerializer):
         # create task
         # manually set owner, workspace fields
         # create a task request if addressed_to != None
-
         addressed_to = validated_data.pop('addressed_to', None)
         validated_data['owner'] = self.context['request'].user
         validated_data['workspace'] = validated_data['unit'].workspace
+
         task = Task.objects.create(**validated_data)
         if addressed_to:
-            task_request = TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
+            TaskRequest.objects.create(task=task, owner=addressed_to, from_user=self.context['request'].user)
         return task
 
     def update(self, task, validated_data):
         # update task
-        # create a task request if addressed_to != None
 
         if task.owner != self.context['request'].user:
             # Ensure the user can only update their tasks
@@ -58,6 +58,8 @@ class TaskSerializer(serializers.ModelSerializer):
         for key, value in validated_data.items():
             setattr(task, key, value)
         task.save()
+
+        # create a task request if addressed_to != None
         if addressed_to:
             try:
                 task_request = TaskRequest.objects.get(task=task)

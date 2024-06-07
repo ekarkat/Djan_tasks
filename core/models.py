@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
 class BaseModel(models.Model):
 	# base model with created_at and updated_at fields
 

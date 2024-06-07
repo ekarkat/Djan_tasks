@@ -1,5 +1,4 @@
 
-from django.contrib.auth.password_validation import CommonPasswordValidator
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
@@ -8,6 +7,7 @@ from .models import UserProfile
 
 
 class RegisterForm(forms.ModelForm):
+    # register form
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     username = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -30,6 +30,7 @@ class RegisterForm(forms.ModelForm):
         return confirm_password
 
     def save(self):
+        # save userprofile
         username = self.cleaned_data.get('username')
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')

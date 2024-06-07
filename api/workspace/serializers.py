@@ -4,8 +4,7 @@ from taskmanager.models import Workspace, Unit
 
 
 class UnitSerializer(serializers.ModelSerializer):
-    # unit serializer with id, title, description, created_at, updated_at, workspace fields
-    # workspace = serializers.CharField(source='workspace.title', read_only=True)
+    # unit serializer with id, title
     class Meta:
         model = Unit
         fields = ['id', 'title']
@@ -41,54 +40,3 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
-
-# class WorkspaceCreateSerializer(serializers.Serializer):
-#     # workspace create serializer with title, description fields
-
-#     title = serializers.CharField()
-#     description = serializers.CharField()
-
-#     class Meta:
-#         fields = (
-#             'title',
-#             'description',
-#         )
-
-#     def validate(self, data):
-#         # Ensure the is a  registered user
-#         user = self.context['request'].user
-#         if not user.is_authenticated:
-#             raise serializers.ValidationError('You must be authenticated to create a workspace')
-#         return data
-
-#     def create(self, validated_data):
-#         print(validated_data)
-#         workspace = Workspace.objects.create(**validated_data)
-
-#         return workspace
-
-#     def to_representation(self, instance):
-#         return WorkspaceSerializer(instance).data
-
-
-# class WorkspaceUpdateSerializer(serializers.Serializer):
-#     # workspace update serializer with title, description fields
-
-#     title = serializers.CharField()
-#     description = serializers.CharField()
-
-#     class Meta:
-#         fields = (
-#             'title',
-#             'description',
-#         )
-
-#     def update(self, workspace, validated_data):
-#         workspace.title = validated_data.get('title', workspace.title)
-#         workspace.description = validated_data.get('description', workspace.description)
-#         workspace.save()
-
-#         return workspace
-
-#     def to_representation(self, instance):
-#         return WorkspaceSerializer(instance).data

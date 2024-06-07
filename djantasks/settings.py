@@ -104,6 +104,8 @@ else:
             'PORT': '5432',
         }
     }
+
+
 # Test configuration solution for the troubleshoot bellow:
 # Creating test database for alias 'default' ('test_djantask_db')...
 # Got an error creating the test database: permission denied to create database
@@ -199,7 +201,7 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULE = {
     'remove-accepted-requests': {
         'task': 'taskmanager.tasks.delete_acepted_requests',
-        'schedule': 21600,
+        'schedule': 86400,
     },
 }
 

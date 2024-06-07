@@ -1,16 +1,15 @@
 import json
-
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from django.db import models
 from django.contrib.auth.models import User
+
 from core.models import BaseModel
 
+
 # Create your models here.
-# user.workspace = workspace.object.filter(owner = user).all()
-# 
+
 class Workspace(BaseModel):
     # workspace class with title, description, owner, members fields
-    # each workspace has a title, description, owner, members
     # each workspace has tasks that can be accessed by workspace.task_set.all()
     # each workspace has comments that can be accessed by workspace.comments.all()
     # A user can access the workspaces they own by user.workspaces.all()
@@ -26,6 +25,7 @@ class Workspace(BaseModel):
         return self.title + ' - ' + self.owner.username
 
     def save(self, *args, **kwargs):
+        # create a comment when a workspace is created or updated
         if self.pk is None:
             instance = super(Workspace, self).save()
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -55,8 +55,8 @@ class Unit(BaseModel):
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='units')
     members = models.ManyToManyField(User, related_name='shared_units', blank=True)
-    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='units')
     status = models.FloatField(blank=True, null=True)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='units')
 
     class Meta:
         verbose_name = 'Unit'
@@ -67,6 +67,7 @@ class Unit(BaseModel):
         return (self.title + ' - '  + self.workspace.title + ' - ' + self.owner.username)
 
     def save(self, *args, **kwargs):
+        # create a comment when a unit is created or updated
         if self.pk is None:
             instance = super(Unit, self).save()
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -81,8 +82,8 @@ class Unit(BaseModel):
 
 class Task(BaseModel):
     # task class with status and priority choices
-    # each task has a todo that can be accessed by task.unit
-    # each task has a creator that can be accessed by task.created_by
+    # each task has a unit that can be accessed by task.unit
+    # each task has a owner that can be accessed by task.owner
     # each task can be accessed to users,  task.addressed_to.all()
     # A user can access the tasks they created by user.created_tasks.all()
     # A user can access the tasks they are assigned to by user.addressed_tasks.all()
@@ -101,18 +102,21 @@ class Task(BaseModel):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     deadline = models.DateTimeField(blank=True, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
     addressed_to = models.ForeignKey(User, related_name='addressed_tasks', on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.OPEN)
     priority = models.CharField(max_length=10, choices=PriorityChoices.choices, blank=True, null=True)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='tasks')
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='tasks')
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='tasks')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
 
     def __str__(self):
         out = self.title + ' - ' + self.unit.title
         return out
 
     def save(self, *args, **kwargs):
+        # create a comment when a task is created or updated
+        # create a periodic task to check the deadline
+
         if self.pk is None:
             instance = super(Task, self).save()
             text = f"Created by {self.owner.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -146,13 +150,15 @@ class Task(BaseModel):
                     periodic_task.one_off = True
                     periodic_task.save()
                 except PeriodicTask.DoesNotExist:
+                    # get or create the crontab
+                    crontab, created = CrontabSchedule.objects.get_or_create(
+                    minute = self.deadline.minute,
+                    hour = self.deadline.hour,
+                    day_of_month = self.deadline.day,
+                    month_of_year = self.deadline.month,
+                    )
                     PeriodicTask.objects.create(
-                        crontab, created = CrontabSchedule.objects.get_or_create(
-                            minute = self.deadline.minute,
-                            hour = self.deadline.hour,
-                            day_of_month = self.deadline.day,
-                            month_of_year = self.deadline.month,
-                        ),
+                        crontab = crontab,
                         name = f'{self.id}',
                         task = 'taskmanager.tasks.check_deadline',
                         kwargs = json.dumps({'task_id': self.id}),
@@ -165,9 +171,9 @@ class Task(BaseModel):
         return instance
 
     def address_this_task(self, user):
-        # address a task to a user
+        # a methode to address a task to a user
         if User.objects.filter(id=user.id).exists():
-            task_request = TaskRequest.objects.create(task=slef, owner=user, from_user=self.owner)
+            task_request = TaskRequest.objects.create(task=self, owner=user, from_user=self.owner)
             return task_request
         return None
 

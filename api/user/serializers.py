@@ -17,7 +17,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'created_at', 'username','email', 'first_name', 'last_name', 'phone', 'workspace']
 
     def get_workspace(self, obj):
-        # Optimized fetching should be handled in the viewset
+        # workspace field representation
         return [{'id': ws.id, 'title': ws.title} for ws in obj.user.workspaces.all()]
 
 
@@ -34,8 +34,7 @@ class UserProfileCreateSerializer(serializers.Serializer):
     image = serializers.ImageField(required=False)
 
     class Meta:
-        # model = UserProfile
-        fields = (
+        fields = [
             'username',
             'email',
             'password',
@@ -44,7 +43,7 @@ class UserProfileCreateSerializer(serializers.Serializer):
             'last_name',
             'phone',
             'image',
-        )
+            ]
 
     def validate(self, data):
         # Ensure the new email, username is not already in use by another user
@@ -91,10 +90,11 @@ class UserProfileUpdateSerializer(serializers.Serializer):
 
     def validate(self, data):
         # Ensure the new email, username is not already in use by another user
-
-        if User.objects.filter(username=data.get('user').get('username')).exists() and data.get('user').get('username') != self.instance.user.username:
+        username = data.get('user').get('username')
+        if not username:
+            raise ValidationError('user is required')
+        if User.objects.filter(username=username).exclude(username=self.instance.user.username).exists():
             raise ValidationError('username already exist')
-
         if UserProfile.objects.filter(email=data.get('email')).exclude(user=self.instance.user).exists():
             raise ValidationError('email already exist')
         return data

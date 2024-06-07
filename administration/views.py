@@ -4,7 +4,9 @@ from django.contrib.auth import logout
 
 from .forms import RegisterForm, LoginForm
 
+
 def register(request):
+    # register view
     if request.user.is_authenticated:
         return redirect('core:home')
     if request.method == 'POST':
@@ -20,6 +22,7 @@ def register(request):
 
 
 def user_login(request):
+    # login view
     if request.user.is_authenticated:
         return redirect('core:home')
     if request.method == 'POST':

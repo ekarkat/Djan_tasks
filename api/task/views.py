@@ -7,6 +7,7 @@ from api.task.serializers import TaskSerializer
 from taskmanager.models import Task
 from api.permissions import IsOwnerOrReadOnly
 
+
 class TaskViewSet(viewsets.ModelViewSet):
     # user profile view set with list, retrieve, create, update, destroy actions
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
