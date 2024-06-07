@@ -137,6 +137,7 @@ class Task(BaseModel):
         else:
             instance = super(Task, self).save()
             text = f"Updated by {self.owner.username} at {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+            # create a periodic task to check the deadline
             if self.deadline:
                 try:
                     periodic_task = PeriodicTask.objects.get(name=f'{self.id}')
@@ -150,20 +151,18 @@ class Task(BaseModel):
                     periodic_task.one_off = True
                     periodic_task.save()
                 except PeriodicTask.DoesNotExist:
-                    # get or create the crontab
-                    crontab, created = CrontabSchedule.objects.get_or_create(
-                    minute = self.deadline.minute,
-                    hour = self.deadline.hour,
-                    day_of_month = self.deadline.day,
-                    month_of_year = self.deadline.month,
-                    )
                     PeriodicTask.objects.create(
-                        crontab = crontab,
+                            crontab= CrontabSchedule.objects.create(
+                            minute = self.deadline.minute,
+                            hour = self.deadline.hour,
+                            day_of_month = self.deadline.day,
+                            month_of_year = self.deadline.month,
+                        ),
                         name = f'{self.id}',
                         task = 'taskmanager.tasks.check_deadline',
                         kwargs = json.dumps({'task_id': self.id}),
                         enabled = True,
-                        one_off=True
+                        one_off = True
                     )
 
         TaskComment.objects.create(task=self, user=self.owner, text=text)
